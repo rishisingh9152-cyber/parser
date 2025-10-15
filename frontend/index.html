@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Credit Card PDF Parser</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      height: 100vh; background: #f3f4f6;
+    }
+    form {
+      background: white; padding: 20px 40px;
+      border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    input[type=file] { margin-bottom: 20px; }
+    button {
+      background: #4CAF50; color: white; border: none;
+      padding: 10px 20px; cursor: pointer; border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Upload Credit Card Statement</h1>
+  <form id="uploadForm">
+    <input type="file" id="pdfFile" name="pdf" accept="application/pdf" required />
+    <br />
+    <button type="submit">Upload & Extract</button>
+  </form>
+
+  <script>
+    document.getElementById("uploadForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const file = document.getElementById("pdfFile").files[0];
+      if (!file) return alert("Please upload a PDF.");
+
+      const formData = new FormData();
+      formData.append("pdf", file);
+
+      const response = await fetch("http://localhost:5000/upload", {
+        method: "POST",
+        body: formData
+      });
+
+      if (!response.ok) {
+        alert("Error processing file");
+        return;
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "summary.pdf";
+      a.click();
+    });
+  </script>
+</body>
+</html>
